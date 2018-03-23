@@ -29,6 +29,7 @@ before_install:
 
 install:
     - composer self-update
+    - composer config "platform.ext-mongo" "1.6.16"
     - composer install
     - rm -rf tests/Features/Functional/cache/*
 
