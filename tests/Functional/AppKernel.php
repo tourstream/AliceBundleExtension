@@ -10,6 +10,7 @@
  */
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Fidry\AliceBundleExtension\Tests\Functional\Bundle\TestBundle\TestBundle;
 use Fidry\AliceDataFixtures\Bridge\Symfony\FidryAliceDataFixturesBundle;
 use Nelmio\Alice\Bridge\Symfony\NelmioAliceBundle;
@@ -26,6 +27,7 @@ class AppKernel extends Kernel
             new FrameworkBundle(),
             new FidryAliceDataFixturesBundle(),
             new TestBundle(),
+            new DoctrineMongoDBBundle(),
             new NelmioAliceBundle()
         ];
     }
