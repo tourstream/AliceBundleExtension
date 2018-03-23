@@ -17,7 +17,6 @@ matrix:
     fast_finish: true
 
 services:
-  - mysql
   - mongodb
 
 before_install:
