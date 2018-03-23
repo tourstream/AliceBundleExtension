@@ -23,7 +23,8 @@
         "doctrine/mongodb-odm-bundle": "~3.0",
         "friendsofphp/php-cs-fixer": "^2.0",
         "phpunit/phpunit": "^4.8",
-        "alcaeus/mongo-php-adapter": "^1.1"
+        "alcaeus/mongo-php-adapter": "^1.1",
+        "doctrine/data-fixtures": "^1.3"
     },
     "autoload": {
         "psr-4": {
@@ -34,5 +35,9 @@
         "psr-4": {
             "Fidry\\AliceBundleExtension\\Tests\\": "tests"
         }
+    },
+    "config": {
+        "bin-dir": "bin",
+        "sort-packages": true
     }
 }
