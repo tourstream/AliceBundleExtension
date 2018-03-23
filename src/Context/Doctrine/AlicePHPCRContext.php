@@ -27,9 +27,7 @@ class AlicePHPCRContext extends AbstractAliceContext
     {
         $this->init(
             $kernel,
-            $kernel->getContainer()->get('hautelook_alice.doctrine.phpcr.fixtures_finder'),
-            $kernel->getContainer()->get('hautelook_alice.fixtures.loader'),
-            $this->resolvePersister($kernel->getContainer()->get('doctrine.phpcr.entity_manager'))
+            $kernel->getContainer()->get('fidry_alice_data_fixtures.loader.doctrine_phpcr')
         );
 
         return $this;

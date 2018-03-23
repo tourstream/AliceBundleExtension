@@ -13,7 +13,7 @@ namespace Fidry\AliceBundleExtension;
 
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
-use Hautelook\AliceBundle\DependencyInjection\Configuration as HautelookAliceBundleConfiguration;
+use Fidry\AliceDataFixtures\Bridge\Symfony\DependencyInjection\Configuration as FidryAliceDataFixturesBundleConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -54,13 +54,13 @@ class Extension implements ExtensionInterface
                     ->addDefaultsIfNotSet()
                     ->cannotBeOverwritten()
                     ->children()
-                        ->booleanNode(HautelookAliceBundleConfiguration::ORM_DRIVER)
+                        ->booleanNode(FidryAliceDataFixturesBundleConfiguration::DOCTRINE_ORM_DRIVER)
                             ->defaultValue(null)
                         ->end()
-                        ->booleanNode(HautelookAliceBundleConfiguration::MONGODB_DRIVER)
+                        ->booleanNode(FidryAliceDataFixturesBundleConfiguration::DOCTRINE_MONGODB_ODM_DRIVER)
                             ->defaultValue(null)
                         ->end()
-                            ->booleanNode(HautelookAliceBundleConfiguration::PHPCR_DRIVER)
+                            ->booleanNode(FidryAliceDataFixturesBundleConfiguration::DOCTRINE_PHPCR_ODM_DRIVER)
                                 ->defaultValue(null)
                         ->end()
                     ->end()

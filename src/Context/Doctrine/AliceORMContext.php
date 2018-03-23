@@ -11,6 +11,7 @@
 
 namespace Fidry\AliceBundleExtension\Context\Doctrine;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -33,12 +34,10 @@ class AliceORMContext extends AbstractAliceContext
     {
         $this->init(
             $kernel,
-            $kernel->getContainer()->get('hautelook_alice.doctrine.orm.fixtures_finder'),
-            $kernel->getContainer()->get('hautelook_alice.fixtures.loader'),
-            $this->resolvePersister($kernel->getContainer()->get('doctrine.orm.entity_manager'))
+            $kernel->getContainer()->get('fidry_alice_data_fixtures.loader.doctrine')
         );
 
-        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $kernel->getContainer()->get('doctrine.orm.default_entity_manager');
 
         $this->schemaTool = new SchemaTool($entityManager);

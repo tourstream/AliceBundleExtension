@@ -12,7 +12,7 @@
 namespace Fidry\AliceBundleExtension\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Nelmio\Alice\PersisterInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterInterface;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>

@@ -33,9 +33,7 @@ class AliceODMContext extends AbstractAliceContext
     {
         $this->init(
             $kernel,
-            $kernel->getContainer()->get('hautelook_alice.doctrine.mongodb.fixtures_finder'),
-            $kernel->getContainer()->get('hautelook_alice.fixtures.loader'),
-            $this->resolvePersister($kernel->getContainer()->get('doctrine_mongodb.odm.default_document_manager'))
+            $kernel->getContainer()->get('fidry_alice_data_fixtures.loader.doctrine_mongodb')
         );
 
         $this->schemaManager = $kernel->getContainer()->get('doctrine_mongodb.odm.default_document_manager')->getSchemaManager();

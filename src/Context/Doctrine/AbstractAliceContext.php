@@ -15,10 +15,10 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Doctrine\Common\Persistence\ObjectManager;
 use Fidry\AliceBundleExtension\Context\AliceContextInterface;
-use Hautelook\AliceBundle\Alice\DataFixtures\LoaderInterface;
-use Hautelook\AliceBundle\Finder\FixturesFinderInterface;
-use Nelmio\Alice\Persister\Doctrine;
-use Nelmio\Alice\PersisterInterface;
+use Fidry\AliceDataFixtures\Bridge\Doctrine\Persister\ObjectManagerPersister;
+use Fidry\AliceDataFixtures\LoaderInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterAwareInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -40,11 +40,6 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
     protected $classes;
 
     /**
-     * @var FixturesFinderInterface
-     */
-    protected $fixturesFinder;
-
-    /**
      * @var KernelInterface
      */
     protected $kernel;
@@ -53,11 +48,6 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
      * @var LoaderInterface
      */
     protected $loader;
-
-    /**
-     * @var PersisterInterface
-     */
-    protected $persister;
 
     /**
      * @param string|null $basePath
@@ -69,22 +59,16 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
 
     /**
      * @param KernelInterface                  $kernel
-     * @param FixturesFinderInterface          $fixturesFinder
      * @param LoaderInterface                  $loader
-     * @param PersisterInterface|ObjectManager $persister
      * @param string                           $basePath
      */
     final public function init(
         KernelInterface $kernel,
-        FixturesFinderInterface $fixturesFinder,
         LoaderInterface $loader,
-        PersisterInterface $persister,
         $basePath = null
     ) {
         $this->kernel = $kernel;
-        $this->fixturesFinder = $fixturesFinder;
         $this->loader = $loader;
-        $this->persister = $persister;
 
         if (null !== $basePath) {
             $this->basePath = $basePath;
@@ -119,9 +103,13 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
     /**
      * @Transform /^service$/
      *
+     * @param string $serviceId
+     *
+     * @return object
+     *
      * @throws ServiceNotFoundException
      */
-    public function castServiceIdToService($serviceId)
+    public function castServiceIdToService(string $serviceId)
     {
         return $this->kernel->getContainer()->get($serviceId);
     }
@@ -129,9 +117,13 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
     /**
      * @Transform /^persister$/
      *
+     * @param string $serviceId
+     *
+     * @return PersisterInterface
+     *
      * @throws ServiceNotFoundException
      */
-    public function castServiceIdToPersister($serviceId)
+    public function castServiceIdToPersister(string $serviceId)
     {
         $service = $this->castServiceIdToService($serviceId);
 
@@ -166,12 +158,9 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
      */
     private function loadFixtures($fixturesFiles, $persister = null)
     {
-        if (null === $persister) {
-            $persister = $this->persister;
-        }
-
-        if (true === is_string($persister)) {
+        if (true === is_string($persister) && $this->loader instanceof PersisterAwareInterface) {
             $persister = $this->castServiceIdToPersister($persister);
+            $this->loader->withPersister($persister);
         }
 
         $fixtureBundles = [];
@@ -199,6 +188,7 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
             $fixturesFiles[$key] = sprintf('%s/%s', $this->basePath, $fixturesFile);
         }
 
+        /**
         if (false === empty($fixtureBundles)) {
             $fixturesFiles = array_merge(
                 $fixturesFiles,
@@ -211,16 +201,14 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
                 $fixturesFiles,
                 $this->fixturesFinder->getFixturesFromDirectory($fixtureDirectories)
             );
-        }
+        } **/
 
-        $this->loader->load(
-            $persister,
-            $this->fixturesFinder->resolveFixtures($this->kernel, $fixturesFiles)
-        );
+        $this->loader->load( $fixturesFiles);
+        //$this->loader->load( $this->fixturesFinder->resolveFixtures($this->kernel, $fixturesFiles));
     }
 
     /**
-     * @param Doctrine|PersisterInterface|null $persister
+     * @param ObjectManager|PersisterInterface $persister
      *
      * @return PersisterInterface
      *
@@ -228,19 +216,17 @@ abstract class AbstractAliceContext implements KernelAwareContext, AliceContextI
      */
     final protected function resolvePersister($persister)
     {
-        if (null === $persister) {
-            return $this->persister;
-        }
-
         switch (true) {
             case $persister instanceof PersisterInterface:
                 return $persister;
             case $persister instanceof ObjectManager:
-                return new Doctrine($persister);
+                return new ObjectManagerPersister($persister);
 
             default:
                 throw new \InvalidArgumentException(sprintf(
-                    'Invalid persister type, expected Nelmio\Alice\PersisterInterface or Doctrine\Common\Persistence\ObjectManager. Got %s instead.',
+                    'Invalid persister type, expected %s or %s. Got %s instead.',
+                    PersisterInterface::class,
+                    ObjectManager::class,
                     get_class($persister)
                 ));
         }

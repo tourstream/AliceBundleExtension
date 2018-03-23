@@ -2,9 +2,12 @@
 
 namespace Fidry\AliceBundleExtension\Tests;
 
+use Fidry\AliceBundleExtension\Context\Initializer\AliceContextInitializer;
 use Fidry\AliceBundleExtension\Extension;
 use PHPUnit_Framework_TestCase;
+use Prophecy\Argument;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -31,7 +34,7 @@ class ExtensionTest extends PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
 
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
         $containerBuilderProphecy->getParameter('paths.base')->willReturn('basePath');
@@ -61,7 +64,7 @@ class ExtensionTest extends PHPUnit_Framework_TestCase
         $containerBuilderProphecy
             ->setDefinition(
                 'behat.alice_fixtures_extension.alice_context_initializer',
-                $this->definition('Fidry\AliceBundleExtension\Context\Initializer\AliceContextInitializer')
+                $this->definition(AliceContextInitializer::class)
             )
             ->shouldBeCalled()
         ;
@@ -85,7 +88,7 @@ class ExtensionTest extends PHPUnit_Framework_TestCase
      */
     public function definition($class)
     {
-        return \Prophecy\Argument::that(function ($args) use ($class) {
+        return Argument::that(function ($args) use ($class) {
             /** @var Definition $args */
             if (false === $args instanceof Definition) {
                 return false;
@@ -105,7 +108,7 @@ class ExtensionTest extends PHPUnit_Framework_TestCase
      */
     private function service($filePath)
     {
-        return \Prophecy\Argument::that(function ($args) use ($filePath) {
+        return Argument::that(function ($args) use ($filePath) {
             /** @var FileResource $args */
             if (false === $args instanceof FileResource) {
                 return false;
